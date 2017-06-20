@@ -17,8 +17,7 @@ RUN chown -R www-data:www-data /var/lib/nginx \
 && echo 'root:root' | chpasswd \
 && sed -i 's/PermitRootLogin/# PermitRootLogin/' /etc/ssh/sshd_config \
 && echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config \
-&& echo "Asia/Seoul" > /etc/timezone \
-&& dpkg-reconfigure tzdata
+&& echo "Asia/Seoul" > /etc/timezone
 
 ADD app /app
 RUN pip install -r /app/requirements.txt
