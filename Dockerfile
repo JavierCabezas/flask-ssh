@@ -1,13 +1,15 @@
-## Ubuntu Dockerfile
-## nginx
-FROM ubuntu:16.04
+FROM ubuntu
+ENV TZ=America/Santiago
+RUN apt-get update
 
 ## Install
-RUN sed -i 's/# \(.*multiverse$\)/\1/g' /etc/apt/sources.list \
-&& apt update \
-&& apt install -y curl wget vim git nginx-full openssh-server supervisor python python-dev python-setuptools build-essential sqlite3 \
-&& easy_install pip \
-&& pip install uwsgi \
+RUN apt-get update \
+&& apt-get install -y --no-install-recommends apt-utils \
+&& apt-get install -y python3.7 \
+&& ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone \
+&& apt-get install -y python3-pip \
+&& apt-get install -y curl wget vim git nginx-full openssh-server supervisor build-essential sqlite3 \
+&& pip3 install uwsgi \
 && mkdir -p /var/run/sshd /var/log/supervisor \
 && rm -rf /var/lib/apt/lists/*
 
@@ -17,10 +19,10 @@ RUN chown -R www-data:www-data /var/lib/nginx \
 && echo 'root:root' | chpasswd \
 && sed -i 's/PermitRootLogin/# PermitRootLogin/' /etc/ssh/sshd_config \
 && echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config \
-&& echo "Asia/Seoul" > /etc/timezone
+&& echo $TZ > /etc/timezone
 
 ADD app /app
-RUN pip install -r /app/requirements.txt
+RUN pip3 install -r /app/requirements.txt
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY mysite.conf /etc/nginx/sites-enabled/mysite.conf
